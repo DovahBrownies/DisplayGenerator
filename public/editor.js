@@ -2,8 +2,8 @@
 // Repository: https://github.com/rickkas7/DisplayGenerator
 // License: MIT
 
-var screenx = 128;
-var screeny = 64;
+var screenx = 128; // Max allowed size X
+var screeny = 128; // Max allowed size Y
 var zoom = 3;
 var margin = 4;
 var showMini = true;
@@ -426,6 +426,11 @@ function initializeVue() {
 					if (val === 'short') {
 						// 128x32
 						screeny = 32;
+					}
+					else if (val === 'SH110X_large') {
+						// 128x128
+						screenx = 128;
+						screeny = 128;
 					}
 					else {
 						// 128x64
@@ -1069,13 +1074,15 @@ function processCommands() {
 			
 			
 		case 'setTextColor':
+			const colorPrex = mainApp.displayType === 'SH110X_large' ? 'SH110X_' : '';
+
 			if (!cmd.invert) {
 				gfx.setTextColor(1);
-				codeImpl += indent + gfxClass + 'setTextColor(WHITE);\n';				
+				codeImpl += indent + gfxClass + `setTextColor(${colorPrex}WHITE);\n`;				
 			}
 			else {
 				gfx.setTextColor2(0, 1);
-				codeImpl += indent + gfxClass + 'setTextColor(BLACK, WHITE);\n';				
+				codeImpl += indent + gfxClass + `setTextColor(${colorPrex}BLACK, ${colorPrex}WHITE);\n`;				
 			}
 			break;
 			

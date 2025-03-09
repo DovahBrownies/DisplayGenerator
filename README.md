@@ -87,6 +87,12 @@ It also generates the C++ display code, including the GFX calls, any additional 
 
 The Javascript code takes the display bitmap and renders it on a HTML5 canvas in normal and zoomed size.
 
+## Running Locally:
+Run the following command and open `http://localhost:8000/public/` in your browser:
+
+```
+python -m http.server 8000
+```
 
 ## Releases
 
