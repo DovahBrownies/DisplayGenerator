@@ -8,6 +8,9 @@ I like to use the SSD1306-based displays in Particle projects. They're small and
 - 128 x 32 short
 - 128 x 64 yellow and blue, with the top 16 pixels yellow and the rest blue
 
+There's also support for SH110X OLED displays:
+- 128 x 128 white (1.5")
+
 They're available with I2C and SPI interfaces. I recommend I2C; it's fewer pins (D0 and D1 only) and the added speed of SPI is not worth the effort in my opinion.
 
 On Particle devices, the [Adafruit GFX library](https://github.com/adafruit/Adafruit-GFX-Library) is typically used to draw to the display. It works great, but it's kind of a pain to have to adjust a pixel or two, recompile and flash your code, and repeat the process over and over.
