@@ -2,8 +2,10 @@
 // Repository: https://github.com/rickkas7/DisplayGenerator
 // License: MIT
 
-var screenx = 128; // Max allowed size X
-var screeny = 128; // Max allowed size Y
+var maxScreenX = 128;
+var maxScreenY = 128;
+var currentScreenX = 128;
+var currentScreenY = 64;
 var zoom = 3;
 var margin = 4;
 var showMini = true;
@@ -23,10 +25,10 @@ var Module = {
 		onRuntimeInitialized: function() {
 			// console.log('Enscripten loaded!');
 			
-			// Create an Adafruit GFX 1-bit deep bitmap of screenx x screeny pixels
+			// Create an Adafruit GFX 1-bit deep bitmap of maxScreenX and maxScreenY pixels
 			// Note: when using the short display the GFX screen size is still set at
 			// 128x64, it's just the bottom half isn't rendered to the screen.
-			gfx = new Module.TestGFX(screenx, screeny);
+			gfx = new Module.TestGFX(maxScreenX, maxScreenY);
 
 			initializeVue();	
 		}
@@ -386,15 +388,15 @@ function initializeVue() {
 				if (cx < 0) {
 					cx = 0;
 				}
-				if (cx > screenx) {
-					cx = screenx;
+				if (cx > currentScreenX) {
+					cx = currentScreenX;
 				}
 				var cy = Math.round((y - margin) / zoom);
 				if (cy < 0) {
 					cy = 0;
 				}
-				if (cy > screeny) {
-					cy = screeny;
+				if (cy > currentScreenY) {
+					cy = currentScreenY;
 				}
 
 				this.coordinates = '(' + cx + ', ' + cy + ')';
@@ -425,16 +427,16 @@ function initializeVue() {
 				handler(val) {
 					if (val === 'short') {
 						// 128x32
-						screeny = 32;
+						currentScreenY = 32;
 					}
 					else if (val === 'SH110X_large') {
 						// 128x128
-						screenx = 128;
-						screeny = 128;
+						currentScreenX = 128;
+						currentScreenY = 128;
 					}
 					else {
 						// 128x64
-						screeny = 64;
+						currentScreenY = 64;
 					}
 					
 					document.getElementById('mainCanvas').height = mainCanvasHeight();
@@ -842,7 +844,7 @@ function initializeVue() {
 					switch(this.standardLogoSelect) {
 					case 'p128x32':
 						selectedCmd.x = 0;
-						selectedCmd.y = (screeny == 32) ? 0 : 16;
+						selectedCmd.y = (currentScreenY == 32) ? 0 : 16;
 						selectedCmd.width = 128;
 						selectedCmd.height = 32;
 						selectedCmd.bitmap = particle128x32;
@@ -850,7 +852,7 @@ function initializeVue() {
 						
 					case 'p32x32':
 						selectedCmd.x = 48;
-						selectedCmd.y = (screeny == 32) ? 0 : 16;
+						selectedCmd.y = (currentScreenY == 32) ? 0 : 16;
 						selectedCmd.width = 32;
 						selectedCmd.height = 32;
 						selectedCmd.bitmap = particle32x32;
@@ -858,7 +860,7 @@ function initializeVue() {
 
 					case 'p48x48':
 						selectedCmd.x = 40;
-						selectedCmd.y = (screeny == 32) ? -8 : 8;
+						selectedCmd.y = (currentScreenY == 32) ? -8 : 8;
 						selectedCmd.width = 48;
 						selectedCmd.height = 48;
 						selectedCmd.bitmap = particle48x48;
@@ -1113,7 +1115,7 @@ function processCommands() {
 	
 				var cursorY = gfx.getCursorY();
 				cmd.width = gfx.measureTextX(cmd.text);
-				var cursorX = Math.floor((screenx / 2) - (cmd.width / 2));
+				var cursorX = Math.floor((currentScreenX / 2) - (cmd.width / 2));
 								
 				gfx.setCursor(cursorX, cursorY);
 				codeImpl += indent + gfxClass + 'setCursor(' + cursorX + ', ' + cursorY + ');\n';
@@ -1168,13 +1170,13 @@ function mainCanvasY(y) {
 	return margin + y * zoom + ((mainApp.displayType === 'yellow' && y >= yellowTopSize) ? zoom : 0);
 }
 function mainCanvasWidth() {
-	return (2 * margin) + (screenx * zoom);
+	return (2 * margin) + (currentScreenX * zoom);
 }
 function mainCanvasHeight() {
-	return (2 * margin) + (screeny * zoom) + ((mainApp.displayType === 'yellow') ? zoom : 0);
+	return (2 * margin) + (currentScreenY * zoom) + ((mainApp.displayType === 'yellow') ? zoom : 0);
 }
 function miniCanvasLeft() {
-	return (screenx * zoom) + (2 * margin) + miniSeparator;	
+	return (currentScreenX * zoom) + (2 * margin) + miniSeparator;	
 }
 function miniCanvasX(x) {
 	return miniCanvasLeft() + miniMargin + x;
@@ -1183,10 +1185,10 @@ function miniCanvasY(y) {
 	return miniMargin + y + ((mainApp.displayType === 'yellow' && y >= yellowTopSize) ? 1 : 0);
 }
 function miniCanvasWidth() {
-	return (2 * miniMargin) + screenx;
+	return (2 * miniMargin) + currentScreenX;
 }
 function miniCanvasHeight() {
-	return (2 * miniMargin) + screeny + ((mainApp.displayType === 'yellow') ? 1 : 0);
+	return (2 * miniMargin) + currentScreenY + ((mainApp.displayType === 'yellow') ? 1 : 0);
 }
 
 function render() {
@@ -1211,7 +1213,7 @@ function render() {
 
 
 	var byteIndex = 0;
-	for(var yy = 0; yy < screeny; yy++) {
+	for(var yy = 0; yy < currentScreenY; yy++) {
 		if (yellow) {
 			if (yy < yellowTopSize) {
 				ctx.fillStyle = displayYellow;				
@@ -1220,7 +1222,7 @@ function render() {
 				ctx.fillStyle = displayBlue;
 			}
 		}
-		for(var xx = 0; xx < screenx; xx += 8) {
+		for(var xx = 0; xx < currentScreenX; xx += 8) {
 			var pixel8 = bytes[byteIndex++];
 
 			for(var ii = 0; ii < 8; ii++) {
