@@ -231,7 +231,7 @@ function initializeVue() {
 			},
 			moveUpCommand: function() {
 				if (this.selectedCommandId > 0) {
-					for(var ii = 1; ii < mainApp.commands.length - 1; ii++) {
+					for(var ii = 1; ii < mainApp.commands.length; ii++) {
 						var cmd = mainApp.commands[ii];
 						if (cmd.id == this.selectedCommandId) {
 							mainApp.commands[ii] = mainApp.commands[ii - 1];
